@@ -1,0 +1,45 @@
+﻿@page
+@using MiniTwitterWebApp.Services
+@model MiniTwitterWebApp.Areas.Identity.Pages.NewsfeedModel
+@inject IProfileService ProfileService
+@{
+}
+
+
+@if (Model.TweetsInFeed != null && Model.TweetsInFeed.Any())
+{
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Profile.ProfilesFollowing[0].DisplayName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => "Tweet")
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => "Date Posted")
+                </th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.TweetsInFeed)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => ProfileService.FindProfileByIdAsync(item.Id).Result.DisplayName))
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Content)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
