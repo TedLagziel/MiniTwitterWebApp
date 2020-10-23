@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using MiniTwitterWebApp.Services
+@inject SignInManager<IdentityUser> SignInManager;
+@inject IProfileService ProfileService;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,6 +30,13 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @{ var profile = await @ProfileService.FindProfileWithUserName(User.Identity.Name);}
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Profile/Details" asp-route-id="@profile.Id">Profile of @profile.DisplayName</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

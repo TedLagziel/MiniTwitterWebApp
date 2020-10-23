@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using MiniTwitterWebApp.Services;
 
 namespace MiniTwitterWebApp.Areas.Identity.Pages.Account
 {
@@ -23,17 +24,19 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Account
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IProfileService _profileService;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender, IProfileService profileService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _profileService = profileService;
         }
 
         [BindProperty]
@@ -47,6 +50,7 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Account
         {
             [Required]
             [StringLength(15, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
+            [RegularExpression(@"^\S*$", ErrorMessage = "No white space allowed")]
             [Display(Name="Display Name")]
             public string DisplayName { get; set; }
 
@@ -98,7 +102,7 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, displayName = Input.DisplayName,  returnUrl = returnUrl });
                     }
                     else
                     {
