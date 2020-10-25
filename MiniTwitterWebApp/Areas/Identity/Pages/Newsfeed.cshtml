@@ -13,13 +13,16 @@
             <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Profile.ProfilesFollowing[0].DisplayName)
+                    @*@Html.DisplayNameFor(model => "User")*@
+                    User
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => "Tweet")
+                    @*@Html.DisplayNameFor(model => "Tweet")*@
+                    Tweet
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => "Date Posted")
+                    @*@Html.DisplayNameFor(model => "Date Posted")*@
+                    Date Posted
                 </th>
                 <th></th>
             </tr>
@@ -29,7 +32,7 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => ProfileService.FindProfileByIdAsync(item.Id).Result.DisplayName))
+                        <a asp-page="./Profile/Details" asp-route-id="@item.ProfileId">@Html.DisplayFor(modelItem => ProfileService.FindProfileById(item.ProfileId).DisplayName)</a>
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Content)

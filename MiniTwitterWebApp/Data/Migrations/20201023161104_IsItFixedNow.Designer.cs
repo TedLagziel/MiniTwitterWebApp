@@ -3,13 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MiniTwitterWebApp.Data;
 
 namespace MiniTwitterWebApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201023161104_IsItFixedNow")]
+    partial class IsItFixedNow
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,9 +229,14 @@ namespace MiniTwitterWebApp.Data.Migrations
                     b.Property<int?>("FollowingId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProfileId")
+                        .HasColumnType("int");
+
                     b.HasKey("FollowerId", "FollowingId");
 
                     b.HasIndex("FollowingId");
+
+                    b.HasIndex("ProfileId");
 
                     b.ToTable("FollowersFollowing");
                 });
@@ -328,7 +337,7 @@ namespace MiniTwitterWebApp.Data.Migrations
             modelBuilder.Entity("MiniTwitterWebApp.Models.FollowersFollowing", b =>
                 {
                     b.HasOne("MiniTwitterWebApp.Models.Profile", "Follower")
-                        .WithMany("ProfilesFollowing")
+                        .WithMany()
                         .HasForeignKey("FollowerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -338,6 +347,10 @@ namespace MiniTwitterWebApp.Data.Migrations
                         .HasForeignKey("FollowingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MiniTwitterWebApp.Models.Profile", null)
+                        .WithMany("ProfilesFollowing")
+                        .HasForeignKey("ProfileId");
                 });
 
             modelBuilder.Entity("MiniTwitterWebApp.Models.Tweet", b =>

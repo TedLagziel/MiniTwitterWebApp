@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MiniTwitterWebApp.Data;
@@ -61,6 +62,11 @@ namespace MiniTwitterWebApp.Services
             return await _context.Profile.SingleOrDefaultAsync(x => x.Id == id);
         }
 
+        public Profile FindProfileById(int id)
+        {
+            return _context.Profile.SingleOrDefault(x => x.Id == id);
+        }
+
         public async Task CreateNewProfileAsync(string displayName, string userId)
         {
             var profile = new Profile
@@ -73,5 +79,14 @@ namespace MiniTwitterWebApp.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<bool> DoesProfileFollowOther(int profileIdA, int profileIdB)
+        {
+            var profileAFollowing = _context.Profile.Include(p => p.ProfilesFollowing);
+
+            return (await profileAFollowing
+                .FirstAsync(p => p.Id == profileIdA))
+                .ProfilesFollowing
+                .Any(following => following.FollowingId == profileIdB);
+        }
     }
 }

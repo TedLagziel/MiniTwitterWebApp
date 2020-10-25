@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
-namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
+namespace MiniTwitterWebApp.Areas.Identity.Pages.Tweet
 {
     public class DeleteModel : PageModel
     {
-        private readonly Data.ApplicationDbContext _context;
+        private readonly MiniTwitterWebApp.Data.ApplicationDbContext _context;
 
-        public DeleteModel(Data.ApplicationDbContext context)
+        public DeleteModel(MiniTwitterWebApp.Data.ApplicationDbContext context)
         {
             _context = context;
         }
 
         [BindProperty]
-        public Models.Profile Profile { get; set; }
+        public Models.Tweet Tweet { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -24,9 +24,10 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
                 return NotFound();
             }
 
-            Profile = await _context.Profile.FirstOrDefaultAsync(m => m.Id == id);
+            Tweet = await _context.Tweet
+                .Include(t => t.Profile).FirstOrDefaultAsync(m => m.Id == id);
 
-            if (Profile == null)
+            if (Tweet == null)
             {
                 return NotFound();
             }
@@ -40,11 +41,11 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
                 return NotFound();
             }
 
-            Profile = await _context.Profile.FindAsync(id);
+            Tweet = await _context.Tweet.FindAsync(id);
 
-            if (Profile != null)
+            if (Tweet != null)
             {
-                _context.Profile.Remove(Profile);
+                _context.Tweet.Remove(Tweet);
                 await _context.SaveChangesAsync();
             }
 

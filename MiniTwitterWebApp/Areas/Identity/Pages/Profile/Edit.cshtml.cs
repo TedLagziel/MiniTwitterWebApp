@@ -3,16 +3,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MiniTwitterWebApp.Services;
 
 namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
 {
     public class EditModel : PageModel
     {
-        private readonly MiniTwitterWebApp.Data.ApplicationDbContext _context;
+        private readonly Data.ApplicationDbContext _context;
+        private readonly IProfileService _profileService;
 
-        public EditModel(MiniTwitterWebApp.Data.ApplicationDbContext context)
+        public EditModel(Data.ApplicationDbContext context, IProfileService profileService)
         {
             _context = context;
+            _profileService = profileService;
         }
 
         [BindProperty]
@@ -23,6 +26,20 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
             if (id == null)
             {
                 return NotFound();
+            }
+
+            var userName = HttpContext.User.Identity.Name;
+
+            if (userName == null)
+            {
+                return Unauthorized();
+            }
+
+            var isUserSameAsProfile = await _profileService.IsCurrentUserProfileOwner(userName, id.GetValueOrDefault());
+
+            if (!isUserSameAsProfile)
+            {
+                return Forbid();
             }
 
             Profile = await _context.Profile.FirstOrDefaultAsync(m => m.Id == id);
@@ -43,7 +60,8 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
                 return Page();
             }
 
-            _context.Attach(Profile).State = EntityState.Modified;
+            _context.Attach(Profile);
+            _context.Entry(Profile).Property(p => p.DisplayName).IsModified = true;
 
             try
             {
@@ -61,7 +79,7 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
                 }
             }
 
-            return RedirectToPage("./Index");
+            return Page();
         }
 
         private bool ProfileExists(int id)

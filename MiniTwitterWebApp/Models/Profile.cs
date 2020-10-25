@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
 
 namespace MiniTwitterWebApp.Models
 {
@@ -10,7 +9,9 @@ namespace MiniTwitterWebApp.Models
 
         public string UserId { get; set; }
 
-        public IList<Profile> ProfilesFollowing { get; set; }
+        public ICollection<FollowersFollowing> Followers { get; set; }
+        public ICollection<FollowersFollowing> ProfilesFollowing { get; set; }
+
         public IList<Tweet> Tweets { get; set; } = new List<Tweet>();
     }
 }

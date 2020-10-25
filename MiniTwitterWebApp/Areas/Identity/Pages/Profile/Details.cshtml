@@ -5,14 +5,10 @@
 
 @{
     ViewData["Title"] = "Details";
+    var isCurrentUserOwner = await ProfileService.IsCurrentUserProfileOwner(User.Identity.Name, Model.Profile.Id);
 }
 
-<h1>Details</h1>
 
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Profile.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
-</div>
 
 <div>
     <h4>Profile</h4>
@@ -27,16 +23,25 @@
     </dl>
 </div>
 
-@if (await ProfileService.IsCurrentUserProfileOwner(User.Identity.Name, Model.Profile.Id))
+<div>
+
+    @if (isCurrentUserOwner)
+    {
+        <a asp-page="./Edit" asp-route-id="@Model.Profile.Id">Edit</a>
+    }
+</div>
+
+@if (isCurrentUserOwner)
 {
     <div class="row">
         <div class="col-md-4">
-            <form method="post">
+            <form asp-page-handler="tweet" method="post">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="NewTweet.Content" class="control-label"></label>
                     <input asp-for="NewTweet.Content" class="form-control" />
                 </div>
+                <input type="hidden" name="profileId" value="@Model.Profile.Id" />
                 <div class="form-group">
                     <input type="submit" value="Tweet" class="btn btn-primary" />
                 </div>
@@ -45,37 +50,43 @@
     </div>
 }
 
-
 @if (Model.Profile.Tweets != null && Model.Profile.Tweets.Count > 0)
 {
     <div>
         <table class="table">
             <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Profile.Tweets[0].Content)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Profile.Tweets[0].Date)
-                </th>
-                <th></th>
-            </tr>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Profile.Tweets[0].Content)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Profile.Tweets[0].Date)
+                    </th>
+                    <th></th>
+                </tr>
             </thead>
             <tbody>
-            @foreach (var item in Model.Profile.Tweets.OrderByDescending(t => t.Date))
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Content)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Date)
-                    </td>
-                    @*<td>
-                        <a asp-page="./Delete" asp-route-id="@item.Id">Delete Tweet</a>
-                    </td>*@
-                </tr>
-            }
+                @foreach (var item in Model.Profile.Tweets.OrderByDescending(t => t.Date))
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Content)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Date)
+                        </td>
+                        @if (isCurrentUserOwner)
+                        {
+                            <td>
+                                <form asp-page-handler="delete" method="post">
+                                    <button class="btn btn-default">Delete</button>
+                                    <input type="hidden" name="profileId" value="@Model.Profile.Id" />
+                                    <input type="hidden" name="tweetId" value="@item.Id" />
+                                </form>
+                            </td>
+                        }
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

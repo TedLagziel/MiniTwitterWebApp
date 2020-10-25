@@ -9,5 +9,7 @@ namespace MiniTwitterWebApp.Services
         Task CreateNewProfileAsync(string displayName,string userId);
         Task<bool> IsCurrentUserProfileOwner(string userName, int profileId);
         Task<Profile> FindProfileWithUserName(string userName);
+        Profile FindProfileById(int id);
+        Task<bool> DoesProfileFollowOther(int profileIdA, int profileIdB);
     }
 }

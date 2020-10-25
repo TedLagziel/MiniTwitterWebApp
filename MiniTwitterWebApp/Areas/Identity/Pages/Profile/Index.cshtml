@@ -1,4 +1,7 @@
 ﻿@page
+@using MiniTwitterWebApp.Services
+@inject IProfileService ProfileService
+@inject SignInManager<IdentityUser> SignInManager
 @model MiniTwitterWebApp.Areas.Identity.Pages.Profile.IndexModel
 
 @{
@@ -7,9 +10,6 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -23,20 +23,48 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Profile) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DisplayName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UserId)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.Profile)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DisplayName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserId)
+                </td>
+                <td>
+                    @{
+                        if (SignInManager.IsSignedIn(User))
+                        {
+                            var currentProfile = await ProfileService.FindProfileWithUserName(User.Identity.Name);
+
+                            @if (currentProfile.Id == item.Id)
+                            {
+                                <a>This is you</a>
+                            }
+                            else if (await ProfileService.DoesProfileFollowOther(currentProfile.Id, item.Id))
+                            {
+                                <form asp-page-handler="unfollow" method="post">
+                                    <button class="btn btn-default">Unfollow</button>
+                                    <input type="hidden" name="profileAId" value="@currentProfile.Id" />
+                                    <input type="hidden" name="profileBId" value="@item.Id" />
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-page-handler="follow" method="post">
+                                    <button class="btn btn-default">Follow</button>
+                                    <input type="hidden" name="profileAId" value="@currentProfile.Id" />
+                                    <input type="hidden" name="profileBId" value="@item.Id" />
+                                </form>
+                            }
+                        }
+                    }
+                </td>
+                <td>
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> 
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

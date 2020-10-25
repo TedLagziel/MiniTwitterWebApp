@@ -28,7 +28,10 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Profile/Index" asp-route-id="">All Profiles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Tweet/Index" asp-route-id="">All Tweets</a>
                         </li>
                         @{ var profile = await @ProfileService.FindProfileWithUserName(User.Identity.Name);}
                         @if (SignInManager.IsSignedIn(User))
@@ -37,7 +40,7 @@
                                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Profile/Details" asp-route-id="@profile.Id">Profile of @profile.DisplayName</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Newsfeed" asp-route-id="@profile.Id">Newsfeed</a>
+                                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Newsfeed" asp-route-id="">Newsfeed</a>
                             </li>
                         }
                     </ul>

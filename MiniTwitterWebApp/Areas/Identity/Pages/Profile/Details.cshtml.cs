@@ -3,15 +3,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using MiniTwitterWebApp.Models;
 
 namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
 {
     public class DetailsModel : PageModel
     {
-        private readonly MiniTwitterWebApp.Data.ApplicationDbContext _context;
+        private readonly Data.ApplicationDbContext _context;
 
-        public DetailsModel(MiniTwitterWebApp.Data.ApplicationDbContext context)
+        public DetailsModel(Data.ApplicationDbContext context)
         {
             _context = context;
         }
@@ -20,7 +19,7 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
         public Models.Profile Profile { get; set; }
 
         [BindProperty]
-        public Tweet NewTweet { get; set; }
+        public Models.Tweet NewTweet { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -38,14 +37,14 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostTweetAsync(int profileId)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            Profile = await _context.Profile.Include(p => p.Tweets ).SingleOrDefaultAsync(p => p.Id == Profile.Id);
+            Profile = await _context.Profile.Include(p => p.Tweets ).SingleOrDefaultAsync(p => p.Id == profileId);
 
             NewTweet.Date = DateTime.Now;
             NewTweet.Profile = Profile;
@@ -55,6 +54,30 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
             _context.Profile.Update(Profile);
             await _context.Tweet.AddAsync(NewTweet);
             await _context.SaveChangesAsync();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAsync(int profileId, int? tweetId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
+
+            if (tweetId == null)
+            {
+                return BadRequest();
+            }
+
+            _context.Tweet.Remove(new Models.Tweet
+            {
+                Id = tweetId.Value
+            });
+
+            await _context.SaveChangesAsync();
+
+            Profile = await _context.Profile.Include(p => p.Tweets).SingleOrDefaultAsync(p => p.Id == profileId);
 
             return Page();
         }

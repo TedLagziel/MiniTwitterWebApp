@@ -1,6 +1,6 @@
 ﻿@page
 @model MiniTwitterWebApp.Areas.Identity.Pages.Profile.EditModel
-
+  
 @{
     ViewData["Title"] = "Edit";
 }
@@ -18,11 +18,6 @@
                 <label asp-for="Profile.DisplayName" class="control-label"></label>
                 <input asp-for="Profile.DisplayName" class="form-control" />
                 <span asp-validation-for="Profile.DisplayName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Profile.UserId" class="control-label"></label>
-                <input asp-for="Profile.UserId" class="form-control" />
-                <span asp-validation-for="Profile.UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

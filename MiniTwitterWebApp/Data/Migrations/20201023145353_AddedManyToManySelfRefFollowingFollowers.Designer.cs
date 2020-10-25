@@ -3,13 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using MiniTwitterWebApp.Data;
 
 namespace MiniTwitterWebApp.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201023145353_AddedManyToManySelfRefFollowingFollowers")]
+    partial class AddedManyToManySelfRefFollowingFollowers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,10 +223,10 @@ namespace MiniTwitterWebApp.Data.Migrations
 
             modelBuilder.Entity("MiniTwitterWebApp.Models.FollowersFollowing", b =>
                 {
-                    b.Property<int?>("FollowerId")
+                    b.Property<int>("FollowerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("FollowingId")
+                    b.Property<int>("FollowingId")
                         .HasColumnType("int");
 
                     b.HasKey("FollowerId", "FollowingId");
@@ -330,7 +334,7 @@ namespace MiniTwitterWebApp.Data.Migrations
                     b.HasOne("MiniTwitterWebApp.Models.Profile", "Follower")
                         .WithMany("ProfilesFollowing")
                         .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MiniTwitterWebApp.Models.Profile", "Following")
