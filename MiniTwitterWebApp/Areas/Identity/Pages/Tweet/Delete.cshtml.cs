@@ -2,16 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using MiniTwitterWebApp.Services;
 
 namespace MiniTwitterWebApp.Areas.Identity.Pages.Tweet
 {
     public class DeleteModel : PageModel
     {
         private readonly MiniTwitterWebApp.Data.ApplicationDbContext _context;
+        private readonly IProfileService profileService;
 
-        public DeleteModel(MiniTwitterWebApp.Data.ApplicationDbContext context)
+        public DeleteModel(MiniTwitterWebApp.Data.ApplicationDbContext context, IProfileService profileService)
         {
             _context = context;
+            this.profileService = profileService;
         }
 
         [BindProperty]
@@ -41,7 +44,14 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Tweet
                 return NotFound();
             }
 
-            Tweet = await _context.Tweet.FindAsync(id);
+            Tweet = await _context.Tweet.Include(t => t.Profile).SingleAsync(t => t.Id == id);
+
+            var profile = await profileService.FindProfileWithUserName(HttpContext.User.Identity.Name);
+
+            if (!(Tweet.ProfileId == profile.Id))
+            {
+                return Unauthorized();
+            }
 
             if (Tweet != null)
             {

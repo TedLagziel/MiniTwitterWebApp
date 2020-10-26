@@ -50,12 +50,46 @@ namespace MiniTwitterWebApp.Areas.Identity.Pages.Profile
             NewTweet.Profile = Profile;
             NewTweet.ProfileId = Profile.Id;
 
+            if (DetectYoutubeLink(NewTweet.Content))
+            {
+                var youtubeLink = ExtractYoutubeLink(NewTweet.Content);
+                var embeddedLink = TransformYoutubeToEmbed(youtubeLink);
+
+                NewTweet.Content = NewTweet.Content.Replace(youtubeLink, embeddedLink);
+            }
+
             Profile.Tweets.Add(NewTweet);
             _context.Profile.Update(Profile);
             await _context.Tweet.AddAsync(NewTweet);
             await _context.SaveChangesAsync();
 
             return Page();
+        }
+
+        public bool DetectYoutubeLink (string content)
+        {
+            var containsYoutube = content.Contains("https://www.youtube.com/watch?v=");
+
+            return containsYoutube;
+        }
+
+        public string ExtractYoutubeLink(string content)
+        {
+            var exampleYoutubeLink = "https://www.youtube.com/watch?v=";
+
+            var index =  content.IndexOf("https://www.youtube.com/watch?v=");
+
+            return content.Substring(index, exampleYoutubeLink.Length + 11);
+        }
+
+
+        public string TransformYoutubeToEmbed(string youtubeLink)
+        {
+            var vidDirectLink = youtubeLink.Substring(Math.Max(0, youtubeLink.Length - 11));
+
+            var embedLink = $"<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/{vidDirectLink}\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>";
+
+            return embedLink;
         }
 
         public async Task<IActionResult> OnPostDeleteAsync(int profileId, int? tweetId)
